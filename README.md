@@ -17,4 +17,4 @@ Exilium Bot is built to:
 
 Exilium Bot is designed to be **expandable**, **flexible** and **easy to maintain**, making it a strong foundation for any Discord server.
 
-&copy 2025 Harold Guilline. All rights reserved.
+© 2025 Harold Guilline. All rights reserved.
