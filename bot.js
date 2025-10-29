@@ -1,4 +1,4 @@
-// Exilium Bot — Basic Moderation Version
+// Exilium Bot — Moderation + Custom Commands
 const { Client, GatewayIntentBits, PermissionsBitField } = require('discord.js');
 require('dotenv').config();
 
@@ -18,7 +18,6 @@ client.once('ready', () => {
 });
 
 client.on('messageCreate', async (message) => {
-  // Ignore other bots or messages without the prefix
   if (message.author.bot || !message.content.startsWith(PREFIX)) return;
 
   const args = message.content.slice(PREFIX.length).trim().split(/ +/);
@@ -34,8 +33,13 @@ client.on('messageCreate', async (message) => {
     const helpText = [
       '**Exilium Bot Commands**',
       '`!ping` - Check if the bot is alive.',
+      '`!help` - Show this help message.',
       '`!kick @user [reason]` - Kick a user from the server.',
-      '`!ban @user [reason]` - Ban a user from the server.'
+      '`!ban @user [reason]` - Ban a user from the server.',
+      '`!clean <number>` - Clear a specified number of messages (1-100).',
+      '`!say <message>` - Bot repeats your message. (WIP)',
+      '`!greet` - Bot greets the user. (WIP)',
+      '`!8ball <question>` - Gives a random answer. (WIP)'
     ].join('\n');
     return message.channel.send(helpText);
   }
@@ -48,10 +52,7 @@ client.on('messageCreate', async (message) => {
 
     const target = message.mentions.members.first();
     if (!target) return message.reply('Please mention a user to kick.');
-
-    if (!target.kickable) {
-      return message.reply("I can't kick this user (they may have higher permissions).");
-    }
+    if (!target.kickable) return message.reply("I can't kick this user.");
 
     const reason = args.slice(1).join(' ') || 'No reason provided';
     await target.kick(reason).catch(() => null);
@@ -66,15 +67,55 @@ client.on('messageCreate', async (message) => {
 
     const target = message.mentions.members.first();
     if (!target) return message.reply('Please mention a user to ban.');
-
-    if (!target.bannable) {
-      return message.reply("I can't ban this user (they may have higher permissions).");
-    }
+    if (!target.bannable) return message.reply("I can't ban this user.");
 
     const reason = args.slice(1).join(' ') || 'No reason provided';
     await target.ban({ reason }).catch(() => null);
     return message.channel.send(`🔨 **${target.user.tag}** has been banned. Reason: ${reason}`);
   }
+
+  // === !clean ===
+  if (command === 'clean') {
+    if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
+      return message.reply("❌ You don't have permission to use this command.");
+    }
+    if (!message.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
+      return message.reply("❌ I need the Manage Messages permission to do that.");
+    }
+
+    const amount = parseInt(args[0]);
+    if (!amount || isNaN(amount) || amount < 1 || amount > 100) {
+      return message.reply("Please specify a number between 1 and 100.");
+    }
+
+    await message.channel.bulkDelete(amount, true)
+      .then(deleted => {
+        message.channel.send(`🧹 Cleared ${deleted.size} message(s).`)
+          .then(msg => setTimeout(() => msg.delete(), 3000));
+      })
+      .catch(err => {
+        console.error(err);
+        message.reply("❌ I couldn't delete messages, something went wrong.");
+      });
+  }
+
+  // === Example Custom Commands (WIP) ===
+  if (command === 'say') {
+    const text = args.join(' ');
+    if (!text) return message.reply('Please provide a message to say!');
+    message.channel.send(text);
+  }
+
+  if (command === 'greet') {
+    message.channel.send(`Hello ${message.author.username}!`);
+  }
+
+  if (command === '8ball') {
+    const responses = ['Yes', 'No', 'Maybe', 'Definitely', 'Absolutely not'];
+    const choice = responses[Math.floor(Math.random() * responses.length)];
+    message.channel.send(`🎱 ${choice}`);
+  }
+
 });
 
 client.login(process.env.DISCORD_TOKEN);
