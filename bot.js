@@ -15,6 +15,21 @@ const PREFIX = process.env.PREFIX || '!';
 
 client.once('ready', () => {
   console.log(`Exilium Bot is online! Logged in as ${client.user.tag}`);
+
+  // Set stable humorous Idle status
+  const setBotStatus = () => {
+    client.user.setPresence({
+      activities: [
+        { name: 'Watching humans try to follow the rules', type: 3 } // Watching
+      ],
+      status: 'idle' // Yellow idle icon
+    });
+  };
+
+  setBotStatus();
+
+  // Optional: reapply status every 5 minutes in case Replit hot reload resets it
+  setInterval(setBotStatus, 5 * 60 * 1000);
 });
 
 client.on('messageCreate', async (message) => {
@@ -38,7 +53,7 @@ client.on('messageCreate', async (message) => {
       '`!ban @user [reason]` - Ban a user from the server.',
       '`!clean <number>` - Clear a specified number of messages (1-100).',
       '`!say <message>` - Bot repeats your message. (WIP)',
-      '`!greet` - Bot greets the user. (WIP)',
+      '`!greet` - Bot greets the user with a random message and pings them. (WIP)',
       '`!8ball <question>` - Gives a random answer. (WIP)'
     ].join('\n');
     return message.channel.send(helpText);
@@ -100,16 +115,29 @@ client.on('messageCreate', async (message) => {
   }
 
   // === Example Custom Commands (WIP) ===
+  
+  // !say
   if (command === 'say') {
     const text = args.join(' ');
     if (!text) return message.reply('Please provide a message to say!');
     message.channel.send(text);
   }
 
+  // !greet with randomized messages and pinging the user
   if (command === 'greet') {
-    message.channel.send(`Hello ${message.author.username}!`);
+    const greetings = [
+      `Hello`,
+      `Hey there`,
+      `Hi`,
+      `Greetings`,
+      `What's up`
+    ];
+
+    const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+    message.channel.send(`${randomGreeting} ${message.author}, hope you're having a great day! 👋`);
   }
 
+  // !8ball
   if (command === '8ball') {
     const responses = ['Yes', 'No', 'Maybe', 'Definitely', 'Absolutely not'];
     const choice = responses[Math.floor(Math.random() * responses.length)];
