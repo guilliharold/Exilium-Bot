@@ -27,9 +27,7 @@ client.once('ready', () => {
   };
 
   setBotStatus();
-
-  // Optional: reapply status every 5 minutes in case Replit hot reload resets it
-  setInterval(setBotStatus, 5 * 60 * 1000);
+  setInterval(setBotStatus, 5 * 60 * 1000); // Reapply status every 5 mins
 });
 
 client.on('messageCreate', async (message) => {
@@ -47,14 +45,16 @@ client.on('messageCreate', async (message) => {
   if (command === 'help') {
     const helpText = [
       '**Exilium Bot Commands**',
+      '',
       '`!ping` - Check if the bot is alive.',
       '`!help` - Show this help message.',
       '`!kick @user [reason]` - Kick a user from the server.',
       '`!ban @user [reason]` - Ban a user from the server.',
-      '`!clean <number>` - Clear a specified number of messages (1-100).',
-      '`!say <message>` - Bot repeats your message. (WIP)',
-      '`!greet` - Bot greets the user with a random message and pings them. (WIP)',
-      '`!8ball <question>` - Gives a random answer. (WIP)'
+      '`!clear <number>` - Clear a specified number of messages (1-100).',
+      '`!greet` - Bot greets the user with a random message and pings them.',
+      '',
+      '💬 **Need help or want updates?**',
+      'Join the Exilium Bot Support Server: https://discord.gg/HR9S6cJTFE'
     ].join('\n');
     return message.channel.send(helpText);
   }
@@ -89,8 +89,8 @@ client.on('messageCreate', async (message) => {
     return message.channel.send(`🔨 **${target.user.tag}** has been banned. Reason: ${reason}`);
   }
 
-  // === !clean ===
-  if (command === 'clean') {
+  // === !clear ===
+  if (command === 'clear') {
     if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
       return message.reply("❌ You don't have permission to use this command.");
     }
@@ -114,16 +114,7 @@ client.on('messageCreate', async (message) => {
       });
   }
 
-  // === Example Custom Commands (WIP) ===
-  
-  // !say
-  if (command === 'say') {
-    const text = args.join(' ');
-    if (!text) return message.reply('Please provide a message to say!');
-    message.channel.send(text);
-  }
-
-  // !greet with randomized messages and pinging the user
+  // === !greet ===
   if (command === 'greet') {
     const greetings = [
       `Hello`,
@@ -136,14 +127,6 @@ client.on('messageCreate', async (message) => {
     const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
     message.channel.send(`${randomGreeting} ${message.author}, hope you're having a great day! 👋`);
   }
-
-  // !8ball
-  if (command === '8ball') {
-    const responses = ['Yes', 'No', 'Maybe', 'Definitely', 'Absolutely not'];
-    const choice = responses[Math.floor(Math.random() * responses.length)];
-    message.channel.send(`🎱 ${choice}`);
-  }
-
 });
 
 client.login(process.env.DISCORD_TOKEN);
