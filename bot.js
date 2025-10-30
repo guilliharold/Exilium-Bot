@@ -43,20 +43,24 @@ client.on('messageCreate', async (message) => {
 
   // === !help ===
   if (command === 'help') {
-    const helpText = [
-      '**Exilium Bot Commands**',
-      '',
-      '`!ping` - Check if the bot is alive.',
-      '`!help` - Show this help message.',
-      '`!kick @user [reason]` - Kick a user from the server.',
-      '`!ban @user [reason]` - Ban a user from the server.',
-      '`!clear <number>` - Clear a specified number of messages (1-100).',
-      '`!greet` - Bot greets the user with a random message and pings them.',
-      '',
-      '💬 **Need help or want updates?**',
-      'Join the Exilium Bot Support Server: https://discord.gg/HR9S6cJTFE'
-    ].join('\n');
-    return message.channel.send(helpText);
+    const { EmbedBuilder } = require('discord.js');
+
+    const helpEmbed = new EmbedBuilder()
+      .setColor(0x483d8b) // Dark Slate Blue
+      .setTitle('⚙️ Welcome to Exilium Bot!')
+      .setDescription(
+        'Your reliable companion for server moderation and user management.\n\n' +
+        'Exilium helps maintain order with precision — while keeping things friendly and fun!'
+      )
+      .addFields(
+        { name: '📜 General Commands', value: '`!ping` – Check if I’m alive.\n`!help` – Display this help message.\n`!greet` – Get a random greeting from me!' },
+        { name: '🛡️ Moderation Commands', value: '`!kick @user [reason]` – Kick a user.\n`!ban @user [reason]` – Ban a user.\n`!clear <number>` – Clear recent messages (1–100).' },
+        { name: '💬 Support', value: '[Join the Exilium Bot Support Server](https://discord.gg/HR9S6cJTFE)' }
+      )
+      .setFooter({ text: '⚙️ Exilium Bot – Keeping order since 2025' })
+      .setTimestamp();
+
+    return message.channel.send({ embeds: [helpEmbed] });
   }
 
   // === !kick ===
