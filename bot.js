@@ -1,5 +1,14 @@
 const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } = require('discord.js');
 
+// Check for required environment variables
+const { TOKEN, CLIENT_ID, GUILD_ID } = process.env;
+
+if (!TOKEN || !CLIENT_ID || !GUILD_ID) {
+  console.error('ERROR: Missing one or more required environment variables: TOKEN, CLIENT_ID, GUILD_ID');
+  console.error(`Current values -> TOKEN: ${TOKEN ? 'Loaded' : 'Missing'}, CLIENT_ID: ${CLIENT_ID || 'Missing'}, GUILD_ID: ${GUILD_ID || 'Missing'}`);
+  process.exit(1); // Stop the bot safely
+}
+
 // Create a new client instance
 const client = new Client({
   intents: [GatewayIntentBits.Guilds],
@@ -21,13 +30,13 @@ const commands = [
 ].map(command => command.toJSON());
 
 // Register the commands with your guild
-const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+const rest = new REST({ version: '10' }).setToken(TOKEN);
 
 (async () => {
   try {
     console.log('Refreshing slash commands...');
     await rest.put(
-      Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+      Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
       { body: commands },
     );
     console.log('Successfully registered slash commands.');
@@ -60,5 +69,5 @@ Need more help or want to join the community? Check out our support server: [Cli
   }
 });
 
-// Login using Replit Secrets
-client.login(process.env.TOKEN).catch(console.error);
+// Login using the token
+client.login(TOKEN).catch(console.error);
